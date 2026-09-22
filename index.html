@@ -21,6 +21,14 @@
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--ink);
+    transition: background .8s ease;
+  }
+
+  body.light-bg {
+    background:
+      radial-gradient(circle at 20% 20%, #fde7ef 0%, transparent 45%),
+      radial-gradient(circle at 80% 80%, #fdf3d9 0%, transparent 45%),
+      linear-gradient(135deg, #fff8f2 0%, #fdeef3 50%, #faf3e6 100%);
   }
 
   /* ============================================
@@ -34,13 +42,13 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    transition: opacity .4s ease, visibility .4s ease;
+    transition: opacity .5s ease;
     overflow: hidden;
   }
 
   .intro.hide {
     opacity: 0;
-    visibility: hidden;
+    pointer-events: none;
   }
 
   .envelope-scene {
@@ -50,13 +58,9 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    /* عزل السياق عشان الـ z-index يشتغل جوه بس */
-    isolation: isolate;
   }
 
-  /* ============================================
-     ✉️ الظرف — ترتيب الطبقات مضبوط
-     ============================================ */
+  /* ===== الظرف ===== */
   .envelope {
     position: relative;
     width: 440px;
@@ -66,7 +70,7 @@
     cursor: pointer;
     box-shadow: 0 30px 70px -15px rgba(255,255,255,.18), 0 0 0 1px rgba(255,255,255,.08);
     animation: envelopeFloat 3.5s ease-in-out infinite;
-    transition: transform .25s ease, opacity .4s ease;
+    transition: transform .3s ease, opacity .4s ease;
     z-index: 5;
   }
   .envelope:hover { transform: scale(1.02); }
@@ -81,7 +85,6 @@
     transform: translateY(0);
   }
 
-  /* ⬇️ خلف الظرف — z: 0 */
   .envelope-back {
     position: absolute;
     inset: 0;
@@ -90,7 +93,6 @@
     z-index: 0;
   }
 
-  /* ⬇️ الجوانب — z: 1 (تحت الرسالة) */
   .envelope-side {
     position: absolute;
     inset: 0;
@@ -105,7 +107,6 @@
     border-radius: 0 10px 10px 0;
   }
 
-  /* ⬇️ القاع — z: 2 (فوق الجوانب، تحت الرسالة) */
   .envelope-bottom {
     position: absolute;
     inset: 0;
@@ -116,7 +117,6 @@
     pointer-events: none;
   }
 
-  /* ⬇️ الغطاء — z: 4 (تحت الرسالة عشان الرسالة تعدي فوقه) */
   .envelope-flap {
     position: absolute;
     top: 0; left: 0;
@@ -126,16 +126,14 @@
     border-radius: 10px 10px 0 0;
     z-index: 4;
     transform-origin: top center;
-    transition: transform .35s cubic-bezier(.65,.05,.36,1);
+    transition: transform .4s cubic-bezier(.65,.05,.36,1);
     box-shadow: 0 2px 6px rgba(0,0,0,.05);
   }
   .envelope.open .envelope-flap {
     transform: rotateX(180deg);
-    /* ⬇️ الغطاء المفتوح يروح تحت خالص */
     z-index: 1;
   }
 
-  /* ⬇️ الختم — z: 5 */
   .seal {
     position: absolute;
     top: 50%;
@@ -151,14 +149,13 @@
     color: #fff;
     font-size: 1.4em;
     box-shadow: 0 4px 14px rgba(201,162,39,.55), inset 0 -3px 6px rgba(0,0,0,.2);
-    transition: opacity .15s ease, transform .15s ease;
+    transition: opacity .2s ease, transform .2s ease;
   }
   .envelope.open .seal {
     opacity: 0;
     transform: translate(-50%, -50%) scale(.3);
   }
 
-  /* ⬇️ الأسماء — z: 6 */
   .env-to, .env-from {
     position: absolute;
     width: 100%;
@@ -195,18 +192,17 @@
   }
 
   /* ============================================
-     📜 الرسالة — z-index أعلى من كل حاجة في الظرف
+     📜 الرسالة — بتطلع من الظرف وبعدين تنتقل للـ body
      ============================================ */
 
-  /* الـ Wrapper: بيتحرك في المكان بس */
+  /* المكان الأولي: جوه الظرف */
   .letter-wrap {
     position: absolute;
     left: 50%;
     bottom: 40px;
     width: 340px;
     margin-left: -170px;
-    /* ⬇️ أهم سطر: الرسالة فوق كل حاجة في الظرف */
-    z-index: 10;
+    z-index: 20;
     opacity: 0;
     pointer-events: none;
     transform: translateY(0);
@@ -214,45 +210,53 @@
     will-change: transform;
   }
 
-  /* مطبقة جوه الظرف — مخفية ورا القاع (z أقل) */
   .letter-wrap.folded {
     opacity: 1;
     transform: translateY(0);
-    /* ⬇️ جوه الظرف تبقى z أقل من القاع عشان تبان مخفية */
-    z-index: 3;
+    clip-path: inset(0 0 85% 0);
   }
 
-  /* طلعت لفوق — z عالي جداً عشان متتغطاش */
   .letter-wrap.risen {
     opacity: 1;
     transform: translateY(-330px);
-    /* ⬇️ فوق كل حاجة في الظرف */
-    z-index: 20;
+    clip-path: inset(0 0 0 0);
   }
 
-  /* اتوسّعت */
-  .letter-wrap.expanded {
+  /* ⬇️ لما تنتقل للـ body — position: fixed بمستوى الصفحة */
+  .letter-wrap.detached {
     position: fixed;
     left: 50%;
     bottom: auto;
     top: 50%;
+    width: 340px;
+    margin-left: -170px;
+    transform: translateY(-330px);
+    z-index: 5000;
+    pointer-events: none;
+    transition: transform .5s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .letter-wrap.detached.unfolded {
+    transform: translateY(-330px);
+  }
+
+  .letter-wrap.detached.expanded {
     width: 92%;
     max-width: 820px;
     margin-left: -46%;
     transform: translateY(-50%);
-    z-index: 1100;
+    z-index: 5000;
     pointer-events: auto;
     transition: transform .6s cubic-bezier(.34,1.1,.64,1), width .6s ease, margin-left .6s ease;
   }
 
   @media (min-width: 900px) {
-    .letter-wrap.expanded {
+    .letter-wrap.detached.expanded {
       width: 820px;
       margin-left: -410px;
     }
   }
 
-  /* الـ Inner: بيتطبق ويتفرد */
   .letter-inner {
     background: #fffdf7;
     border-radius: 8px;
@@ -452,35 +456,6 @@
   }
 
   /* ============================================
-     🌸 الخلفية
-     ============================================ */
-  .main-bg {
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(circle at 20% 20%, #fde7ef 0%, transparent 45%),
-      radial-gradient(circle at 80% 80%, #fdf3d9 0%, transparent 45%),
-      linear-gradient(135deg, #fff8f2 0%, #fdeef3 50%, #faf3e6 100%);
-    opacity: 0;
-    transition: opacity .6s ease .15s;
-    z-index: 1050;
-    pointer-events: none;
-  }
-  .main-bg.show { opacity: 1; }
-
-  .main-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.6), transparent 60%);
-    animation: breathe 8s ease-in-out infinite;
-  }
-  @keyframes breathe {
-    0%,100% { opacity: .5; transform: scale(1); }
-    50% { opacity: .9; transform: scale(1.08); }
-  }
-
-  /* ============================================
      🌸 الزخارف
      ============================================ */
   .petal {
@@ -489,7 +464,7 @@
     font-size: 18px;
     opacity: 0;
     animation: fall linear infinite;
-    z-index: 1060;
+    z-index: 4000;
     pointer-events: none;
     user-select: none;
   }
@@ -506,7 +481,7 @@
     box-shadow: 0 0 8px 2px rgba(201,162,39,.7);
     opacity: 0;
     animation: twinkle 2.4s ease-in-out infinite;
-    z-index: 1060;
+    z-index: 4000;
     pointer-events: none;
   }
   @keyframes twinkle {
@@ -522,15 +497,19 @@
     .env-to { bottom: 20px; }
     .seal { width: 46px; height: 46px; font-size: 1.1em; }
 
-    .letter-wrap {
+    .letter-wrap,
+    .letter-wrap.detached {
       width: 270px;
       margin-left: -135px;
     }
-    .letter-wrap.risen { transform: translateY(-250px); }
-
-    .letter-wrap.expanded {
+    .letter-wrap.risen,
+    .letter-wrap.detached {
+      transform: translateY(-250px);
+    }
+    .letter-wrap.detached.expanded {
       width: 94%;
       margin-left: -47%;
+      transform: translateY(-50%);
     }
     .letter-wrap.expanded .letter-content { padding: 30px 20px 24px; }
     .letter-wrap.expanded .letter-content h2 { font-size: 2em; }
@@ -541,10 +520,8 @@
 </head>
 <body>
 
-  <div class="main-bg" id="mainBg"></div>
-
   <div class="intro" id="intro">
-    <div class="envelope-scene">
+    <div class="envelope-scene" id="envelopeScene">
 
       <!-- الرسالة -->
       <div class="letter-wrap" id="letter">
@@ -652,43 +629,69 @@
     const env = document.getElementById('envelope');
     const letter = document.getElementById('letter');
     const intro = document.getElementById('intro');
-    const mainBg = document.getElementById('mainBg');
 
-    // 0) الرسالة مطبقة جوه الظرف (z-index: 3 → تحت القاع)
+    // 0) الرسالة مطبقة جوه الظرف
     letter.classList.add('folded');
 
-    // 1) الظرف يفتح (الغطاء يروح z: 1، تحت الرسالة)
+    // 1) الظرف يفتح
     env.classList.add('open');
 
-    // 2) الرسالة تطلع لفوق (z-index: 20 → فوق كل حاجة)
+    // 2) الرسالة تطلع لفوق (لسه جوه intro)
     setTimeout(() => {
       letter.classList.remove('folded');
       letter.classList.add('risen');
-    }, 200);
+    }, 250);
 
     // 3) الرسالة تتفرد
     setTimeout(() => {
       letter.classList.add('unfolded');
-    }, 550);
+    }, 600);
 
-    // 4) الظرف ينزل + الخلفية
+    // 4) ⬇️ أهم خطوة: ننقل الرسالة من جوه intro لـ body مباشرة
+    //    عشان متتأثرش بـ opacity الـ intro
+    setTimeout(() => {
+      // نحسب مكان الرسالة الحالي في الشاشة
+      const rect = letter.getBoundingClientRect();
+
+      // نحولها لـ position: fixed بنفس المكان البصري
+      letter.style.position = 'fixed';
+      letter.style.left = rect.left + 'px';
+      letter.style.top = rect.top + 'px';
+      letter.style.bottom = 'auto';
+      letter.style.marginLeft = '0';
+      letter.style.width = rect.width + 'px';
+
+      // ننقلها للـ body
+      document.body.appendChild(letter);
+
+      // نضيف كلاس detached عشان الـ transitions الجديدة
+      requestAnimationFrame(() => {
+        letter.classList.add('detached');
+        // نظبط الـ left/top للقيم النهائية (نص الشاشة)
+        letter.style.left = '50%';
+        letter.style.marginLeft = '-170px';
+        letter.style.top = '50%';
+        letter.style.transform = 'translateY(-330px)';
+      });
+    }, 900);
+
+    // 5) الظرف ينزل + الخلفية الوردية على body
     setTimeout(() => {
       env.style.transform = 'translateY(500px)';
       env.style.opacity = '0';
-      mainBg.classList.add('show');
-    }, 1000);
+      document.body.classList.add('light-bg');
+    }, 1050);
 
-    // 5) المشهد الأسود يختفي
+    // 6) المشهد الأسود يختفي (دلوقتي الرسالة بره خالص — مش هتتأثر)
     setTimeout(() => {
       intro.classList.add('hide');
-      document.body.style.background = 'transparent';
-    }, 1250);
+    }, 1300);
 
-    // 6) الرسالة تتوسّع
+    // 7) الرسالة تتوسّع + الزخارف تظهر
     setTimeout(() => {
       letter.classList.add('expanded');
       revealDecorations();
-    }, 1450);
+    }, 1600);
   }
 </script>
 </body>
