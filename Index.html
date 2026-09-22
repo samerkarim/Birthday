@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 كل سنة وانتي طيبة يا بطوطة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:ital,wght@0,400;0,700;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rose: #c2185b;
+    --gold: #c9a227;
+    --cream: #fffaf5;
+    --ink: #4a3b3b;
+  }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: #0a0a0a;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--ink);
+  }
+
+  /* ============================================
+     🎬 المشهد الافتتاحي
+     ============================================ */
+  .intro {
+    position: fixed;
+    inset: 0;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity .4s ease, visibility .4s ease;
+    overflow: hidden;
+  }
+
+  .intro.hide {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .envelope-scene {
+    position: relative;
+    width: 460px;
+    height: 460px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  /* ===== الظرف ===== */
+  .envelope {
+    position: relative;
+    width: 440px;
+    height: 290px;
+    background: #ffffff;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 30px 70px -15px rgba(255,255,255,.18), 0 0 0 1px rgba(255,255,255,.08);
+    animation: envelopeFloat 3.5s ease-in-out infinite;
+    transition: transform .25s ease, opacity .4s ease;
+    z-index: 5;
+  }
+  .envelope:hover { transform: scale(1.02); }
+
+  @keyframes envelopeFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .envelope.open {
+    animation: none;
+    transform: translateY(0);
+  }
+
+  .envelope-back {
+    position: absolute;
+    inset: 0;
+    background: #f0f0f0;
+    border-radius: 10px;
+    z-index: 0;
+  }
+
+  .envelope-side {
+    position: absolute;
+    inset: 0;
+    background: rgba(250,250,250,.35);
+    clip-path: polygon(0 0, 50% 50%, 0 100%);
+    border-radius: 10px 0 0 10px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .envelope-side.right {
+    clip-path: polygon(100% 0, 50% 50%, 100% 100%);
+    border-radius: 0 10px 10px 0;
+  }
+  .envelope-bottom {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,.55);
+    clip-path: polygon(0 100%, 50% 50%, 100% 100%);
+    border-radius: 0 0 10px 10px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .envelope-flap {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #ffffff;
+    clip-path: polygon(0 0, 50% 50%, 100% 0);
+    border-radius: 10px 10px 0 0;
+    z-index: 6;
+    transform-origin: top center;
+    transition: transform .35s cubic-bezier(.65,.05,.36,1);
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  }
+  .envelope.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+  }
+
+  .seal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 58px; height: 58px;
+    background: radial-gradient(circle at 35% 30%, #e5c14a, #b88a1f);
+    border-radius: 50%;
+    z-index: 7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.4em;
+    box-shadow: 0 4px 14px rgba(201,162,39,.55), inset 0 -3px 6px rgba(0,0,0,.2);
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  .envelope.open .seal {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.3);
+  }
+
+  .env-to, .env-from {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-family: 'Amiri', serif;
+    color: #3d2b2b;
+    z-index: 8;
+    pointer-events: none;
+    transition: opacity .2s ease;
+    letter-spacing: .5px;
+  }
+  .env-from {
+    top: 26px;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--rose);
+  }
+  .env-to {
+    bottom: 26px;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--rose);
+  }
+  .env-label {
+    font-weight: 400;
+    color: #8a7a7a;
+    font-size: .8em;
+    margin-left: 6px;
+  }
+
+  .envelope.open .env-to,
+  .envelope.open .env-from {
+    opacity: 0;
+  }
+
+  /* ============================================
+     📜 الرسالة — تكبر لحد ما تملأ الشاشة
+     ============================================ */
+  .letter {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    width: 340px;
+    z-index: 3;
+    opacity: 0;
+    transform: translateX(-50%) scaleY(0.12);
+    transform-origin: top center;
+    transition:
+      opacity .2s ease,
+      transform .45s cubic-bezier(.2,.8,.2,1),
+      width .55s ease,
+      bottom .55s ease;
+    pointer-events: none;
+    will-change: transform, width, bottom;
+  }
+
+  .letter-body {
+    background: #fffdf7;
+    border-radius: 8px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.4);
+    border: 1px solid rgba(201,162,39,.45);
+    overflow: hidden;
+    position: relative;
+    transition: padding .5s ease, border-radius .5s ease, background .5s ease, box-shadow .5s ease;
+  }
+
+  .letter-content {
+    padding: 30px 26px;
+    text-align: center;
+    transition: padding .5s ease;
+  }
+
+  .letter-content h2 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 2em;
+    color: var(--rose);
+    margin-bottom: 6px;
+    font-weight: 400;
+    transition: font-size .5s ease;
+  }
+
+  .letter-content .line-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 12px 0;
+    transition: margin .5s ease;
+  }
+
+  .letter-content p {
+    font-family: 'Amiri', serif;
+    font-size: 1.08em;
+    line-height: 2;
+    color: #5a4a4a;
+    transition: font-size .5s ease, line-height .5s ease;
+  }
+
+  .letter-content .name-to {
+    color: var(--rose);
+    font-weight: 700;
+  }
+
+  .letter-content .from-sign {
+    font-family: 'Great Vibes', cursive;
+    font-size: 1.5em;
+    color: var(--rose);
+    margin-top: 8px;
+    transition: font-size .5s ease, margin-top .5s ease;
+  }
+
+  /* خطوط الطي */
+  .fold-line {
+    position: absolute;
+    left: 8%;
+    width: 84%;
+    height: 1px;
+    background: rgba(201,162,39,.35);
+    z-index: 5;
+    transition: opacity .15s ease;
+    pointer-events: none;
+  }
+  .fold-line.one { top: 33.33%; }
+  .fold-line.two { top: 66.66%; }
+
+  .letter.unfolded .fold-line { opacity: 0; }
+
+  /* حالة 1: مطبقة جوه الظرف */
+  .letter.folded {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(0.12);
+    bottom: 40px;
+    z-index: 3;
+  }
+
+  /* حالة 2: طلعت من الظرف (لسه مطبقة) */
+  .letter.risen {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-330px) scaleY(0.12);
+    bottom: 40px;
+    z-index: 9;
+  }
+
+  /* حالة 3: اتفردت */
+  .letter.unfolded {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-330px) scaleY(1);
+    bottom: 40px;
+    z-index: 9;
+  }
+
+  /* ============================================
+     🌟 حالة 4: الرسالة تتوسّع وتملأ الشاشة
+     ============================================ */
+  .letter.expanded {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    bottom: auto;
+    width: 92%;
+    max-width: 820px;
+    transform: translate(-50%, -50%) scaleY(1);
+    z-index: 1100;
+    pointer-events: auto;
+    transition:
+      transform .7s cubic-bezier(.34,1.1,.64,1),
+      width .7s cubic-bezier(.34,1.1,.64,1);
+  }
+
+  .letter.expanded .letter-body {
+    border-radius: 26px;
+    padding: 18px;
+    background: var(--cream);
+    box-shadow:
+      0 30px 70px -20px rgba(194, 24, 91, 0.35),
+      0 10px 30px -10px rgba(201, 162, 39, 0.25);
+  }
+
+  .letter.expanded .letter-content {
+    padding: 45px 45px 35px;
+    position: relative;
+  }
+
+  /* إطار ذهبي جوه الرسالة */
+  .letter.expanded .letter-body::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    border-radius: 18px;
+    pointer-events: none;
+    animation: fadeIn .5s ease .3s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* الزخرفة العلوية */
+  .letter-expand-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 0;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all .5s ease .3s;
+  }
+  .letter.expanded .letter-expand-ornament {
+    max-height: 40px;
+    margin-bottom: 18px;
+    opacity: 1;
+  }
+  .letter-expand-ornament .line {
+    height: 1px;
+    width: 70px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .letter-expand-ornament .dot {
+    color: var(--gold);
+    font-size: .8em;
+    letter-spacing: 4px;
+  }
+
+  /* تكبير الخطوط لما تتوسّع */
+  .letter.expanded .letter-content h2 {
+    font-size: 3em;
+  }
+  .letter.expanded .letter-content p {
+    font-size: 1.4em;
+    line-height: 2.15;
+  }
+  .letter.expanded .letter-content .from-sign {
+    font-size: 1.9em;
+    margin-top: 12px;
+  }
+  .letter.expanded .letter-content .line-divider {
+    margin: 18px 0;
+  }
+
+  /* المحتوى الإضافي */
+  .extra-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .6s ease .4s, opacity .5s ease .5s, margin .6s ease .4s;
+    margin-top: 0;
+  }
+  .letter.expanded .extra-content {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 10px;
+  }
+
+  .extra-content .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 18px 0 10px;
+  }
+  .extra-content .divider span {
+    color: var(--gold);
+    font-size: 1.2em;
+  }
+  .extra-content .divider .line {
+    height: 1px;
+    width: 70px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .extra-content .hearts {
+    font-size: 1.3em;
+    letter-spacing: 12px;
+    margin-top: 12px;
+  }
+  .extra-content .hearts span {
+    display: inline-block;
+    animation: beat 1.8s ease-in-out infinite;
+  }
+  .extra-content .hearts span:nth-child(2) { animation-delay: .2s; }
+  .extra-content .hearts span:nth-child(3) { animation-delay: .4s; }
+  .extra-content .hearts span:nth-child(4) { animation-delay: .6s; }
+  .extra-content .hearts span:nth-child(5) { animation-delay: .8s; }
+  @keyframes beat {
+    0%,100% { transform: scale(1); }
+    30% { transform: scale(1.25); }
+  }
+
+  /* ============================================
+     🌸 خلفية الموقع
+     ============================================ */
+  .main-bg {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, #fde7ef 0%, transparent 45%),
+      radial-gradient(circle at 80% 80%, #fdf3d9 0%, transparent 45%),
+      linear-gradient(135deg, #fff8f2 0%, #fdeef3 50%, #faf3e6 100%);
+    opacity: 0;
+    transition: opacity .6s ease .15s;
+    z-index: 1050;
+    pointer-events: none;
+  }
+  .main-bg.show { opacity: 1; }
+
+  .main-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.6), transparent 60%);
+    animation: breathe 8s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%,100% { opacity: .5; transform: scale(1); }
+    50% { opacity: .9; transform: scale(1.08); }
+  }
+
+  /* بتلات ورد */
+  .petal {
+    position: fixed;
+    top: -40px;
+    font-size: 18px;
+    opacity: .7;
+    animation: fall linear infinite;
+    z-index: 1060;
+    pointer-events: none;
+    user-select: none;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: .8; }
+    90% { opacity: .6; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  .sparkle {
+    position: fixed;
+    width: 4px; height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px rgba(201,162,39,.7);
+    animation: twinkle 2.4s ease-in-out infinite;
+    z-index: 1060;
+    pointer-events: none;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0; transform: scale(.5); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  @media (max-width: 600px) {
+    .envelope-scene { width: 320px; height: 400px; }
+    .envelope { width: 310px; height: 210px; }
+    .env-from, .env-to { font-size: 1.15em; }
+    .env-from { top: 20px; }
+    .env-to { bottom: 20px; }
+    .seal { width: 46px; height: 46px; font-size: 1.1em; }
+
+    .letter { width: 270px; bottom: 30px; }
+    .letter.risen { transform: translateX(-50%) translateY(-250px) scaleY(0.12); }
+    .letter.unfolded { transform: translateX(-50%) translateY(-250px) scaleY(1); }
+
+    .letter.expanded {
+      width: 94%;
+      max-width: 500px;
+    }
+    .letter.expanded .letter-content { padding: 30px 20px 24px; }
+    .letter.expanded .letter-content h2 { font-size: 2em; }
+    .letter.expanded .letter-content p { font-size: 1.05em; line-height: 1.9; }
+    .letter.expanded .letter-content .from-sign { font-size: 1.4em; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- خلفية الموقع -->
+  <div class="main-bg" id="mainBg"></div>
+
+  <!-- المشهد الافتتاحي -->
+  <div class="intro" id="intro">
+    <div class="envelope-scene">
+
+      <!-- الرسالة -->
+      <div class="letter" id="letter">
+        <div class="letter-body">
+          <div class="letter-content">
+
+            <div class="letter-expand-ornament">
+              <div class="line"></div>
+              <div class="dot">✦ ✦ ✦</div>
+              <div class="line"></div>
+            </div>
+
+            <h2>إلى فاطمة</h2>
+            <div class="line-divider"></div>
+            <p>
+              كل سنة وانتي طيبة يا <span class="name-to">بطوطة</span> 🌸<br>
+              ربنا يديكي الصحة والعافية وطول العمر،<br>
+              ويسعدك ويحققلك كل أمنياتك يارب 🤍
+            </p>
+            <div class="line-divider"></div>
+            <p class="from-sign">with love, Samer</p>
+
+            <div class="extra-content">
+              <div class="divider">
+                <div class="line"></div>
+                <span>❦</span>
+                <div class="line"></div>
+              </div>
+              <div class="hearts">
+                <span>🤍</span><span>🌸</span><span>✨</span><span>🌸</span><span>🤍</span>
+              </div>
+            </div>
+
+          </div>
+          <div class="fold-line one"></div>
+          <div class="fold-line two"></div>
+        </div>
+      </div>
+
+      <!-- الظرف -->
+      <div class="envelope" id="envelope" onclick="openLetter()">
+        <div class="envelope-back"></div>
+        <div class="envelope-side"></div>
+        <div class="envelope-side right"></div>
+        <div class="envelope-bottom"></div>
+
+        <div class="env-from">
+          <span class="env-label">من:</span> سامر كريم
+        </div>
+        <div class="env-to">
+          <span class="env-label">إلى:</span> فاطمة أحمد
+        </div>
+
+        <div class="envelope-flap"></div>
+        <div class="seal">💌</div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  let opened = false;
+
+  function openLetter() {
+    if (opened) return;
+    opened = true;
+
+    const env = document.getElementById('envelope');
+    const letter = document.getElementById('letter');
+    const intro = document.getElementById('intro');
+    const mainBg = document.getElementById('mainBg');
+
+    // 0) الرسالة مطبقة جوه الظرف
+    letter.classList.add('folded');
+
+    // 1) الظرف يفتح
+    env.classList.add('open');
+
+    // 2) الرسالة تطلع (لسه مطبقة) — 200ms
+    setTimeout(() => {
+      letter.classList.remove('folded');
+      letter.classList.add('risen');
+    }, 200);
+
+    // 3) الرسالة تتفرد — 550ms
+    setTimeout(() => {
+      letter.classList.add('unfolded');
+    }, 550);
+
+    // 4) الظرف ينزل ويختفي + الخلفية تتغير — 1000ms
+    setTimeout(() => {
+      env.style.transform = 'translateY(500px)';
+      env.style.opacity = '0';
+      mainBg.classList.add('show');
+    }, 1000);
+
+    // 5) المشهد الأسود يختفي بس الرسالة تفضل — 1300ms
+    setTimeout(() => {
+      intro.classList.add('hide');
+      document.body.style.background = 'transparent';
+    }, 1300);
+
+    // 6) الرسالة تتوسّع تدريجياً لحد ما تملأ الشاشة — 1500ms
+    setTimeout(() => {
+      letter.classList.add('expanded');
+      createDecorations();
+    }, 1500);
+  }
+
+  let decorationsCreated = false;
+  function createDecorations() {
+    if (decorationsCreated) return;
+    decorationsCreated = true;
+
+    const petals = ['🌸', '🌷', '🤍', '✨', '🌹'];
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.textContent = petals[Math.floor(Math.random() * petals.length)];
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.fontSize = (12 + Math.random() * 16) + 'px';
+      p.style.animationDuration = (9 + Math.random() * 8) + 's';
+      p.style.animationDelay = (Math.random() * 10) + 's';
+      document.body.appendChild(p);
+    }
+
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.top = Math.random() * 100 + 'vh';
+      s.style.animationDelay = (Math.random() * 3) + 's';
+      s.style.animationDuration = (2 + Math.random() * 2) + 's';
+      document.body.appendChild(s);
+    }
+  }
+</script>
+</body>
+</html>
