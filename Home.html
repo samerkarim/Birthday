@@ -183,26 +183,29 @@
   }
 
   /* ============================================
-     📜 الرسالة — تكبر لحد ما تملأ الشاشة
+     📜 الرسالة — بنستخدم opacity + transform بسيط
      ============================================ */
+
+  /* الحاوية الخارجية: مسؤولة عن المكان والحركة */
   .letter {
     position: absolute;
     bottom: 40px;
     left: 50%;
+    margin-left: -170px; /* نص العرض: 340/2 */
     width: 340px;
     z-index: 3;
     opacity: 0;
-    transform: translateX(-50%) scaleY(0.12);
-    transform-origin: top center;
-    transition:
-      opacity .2s ease,
-      transform .45s cubic-bezier(.2,.8,.2,1),
-      width .55s ease,
-      bottom .55s ease;
     pointer-events: none;
-    will-change: transform, width, bottom;
+    will-change: transform, opacity, width, margin-left, bottom;
+    transition:
+      opacity .3s ease,
+      transform .4s cubic-bezier(.2,.8,.2,1),
+      width .6s cubic-bezier(.34,1.1,.64,1),
+      margin-left .6s cubic-bezier(.34,1.1,.64,1),
+      bottom .6s cubic-bezier(.34,1.1,.64,1);
   }
 
+  /* جسم الرسالة: مسؤول عن الطي/الفرد */
   .letter-body {
     background: #fffdf7;
     border-radius: 8px;
@@ -210,7 +213,14 @@
     border: 1px solid rgba(201,162,39,.45);
     overflow: hidden;
     position: relative;
-    transition: padding .5s ease, border-radius .5s ease, background .5s ease, box-shadow .5s ease;
+    transform: scaleY(0.12);
+    transform-origin: top center;
+    transition:
+      transform .45s cubic-bezier(.34,1.2,.64,1),
+      padding .5s ease,
+      border-radius .5s ease,
+      background .5s ease,
+      box-shadow .5s ease;
   }
 
   .letter-content {
@@ -256,7 +266,6 @@
     transition: font-size .5s ease, margin-top .5s ease;
   }
 
-  /* خطوط الطي */
   .fold-line {
     position: absolute;
     left: 8%;
@@ -264,54 +273,61 @@
     height: 1px;
     background: rgba(201,162,39,.35);
     z-index: 5;
-    transition: opacity .15s ease;
+    transition: opacity .2s ease;
     pointer-events: none;
   }
   .fold-line.one { top: 33.33%; }
   .fold-line.two { top: 66.66%; }
 
-  .letter.unfolded .fold-line { opacity: 0; }
+  /* ===== الحالات ===== */
 
-  /* حالة 1: مطبقة جوه الظرف */
+  /* 1) مطبقة جوه الظرف */
   .letter.folded {
     opacity: 1;
-    transform: translateX(-50%) scaleY(0.12);
-    bottom: 40px;
+    transform: translateY(0);
     z-index: 3;
   }
 
-  /* حالة 2: طلعت من الظرف (لسه مطبقة) */
+  /* 2) طلعت لفوق (لسه مطبقة) */
   .letter.risen {
     opacity: 1;
-    transform: translateX(-50%) translateY(-330px) scaleY(0.12);
-    bottom: 40px;
+    transform: translateY(-330px);
     z-index: 9;
   }
 
-  /* حالة 3: اتفردت */
+  /* 3) اتفردت */
   .letter.unfolded {
     opacity: 1;
-    transform: translateX(-50%) translateY(-330px) scaleY(1);
-    bottom: 40px;
+    transform: translateY(-330px);
     z-index: 9;
   }
+  .letter.unfolded .letter-body {
+    transform: scaleY(1);
+  }
+  .letter.unfolded .fold-line {
+    opacity: 0;
+  }
 
-  /* ============================================
-     🌟 حالة 4: الرسالة تتوسّع وتملأ الشاشة
-     ============================================ */
+  /* 4) اتوسّعت وملأت الشاشة */
   .letter.expanded {
     position: fixed;
+    bottom: auto;
     top: 50%;
     left: 50%;
-    bottom: auto;
     width: 92%;
     max-width: 820px;
-    transform: translate(-50%, -50%) scaleY(1);
+    margin-left: -46%; /* نص العرض الجديد */
+    transform: translateY(-50%);
     z-index: 1100;
     pointer-events: auto;
-    transition:
-      transform .7s cubic-bezier(.34,1.1,.64,1),
-      width .7s cubic-bezier(.34,1.1,.64,1);
+  }
+
+  /* على الشاشات الكبيرة العرض ثابت */
+  @media (min-width: 900px) {
+    .letter.expanded {
+      width: 820px;
+      margin-left: -410px;
+    }
   }
 
   .letter.expanded .letter-body {
@@ -328,7 +344,6 @@
     position: relative;
   }
 
-  /* إطار ذهبي جوه الرسالة */
   .letter.expanded .letter-body::before {
     content: '';
     position: absolute;
@@ -344,17 +359,30 @@
     to { opacity: 1; }
   }
 
-  /* الزخرفة العلوية */
+  /* تكبير الخطوط */
+  .letter.expanded .letter-content h2 { font-size: 3em; }
+  .letter.expanded .letter-content p { font-size: 1.4em; line-height: 2.15; }
+  .letter.expanded .letter-content .from-sign { font-size: 1.9em; margin-top: 12px; }
+  .letter.expanded .letter-content .line-divider { margin: 18px 0; }
+
+  /* ============================================
+     ✨ العناصر الإضافية — موجودة من البداية ومخفية
+     ============================================ */
+
+  /* الزخرفة العلوية — موجودة في الـ DOM ومخفية */
   .letter-expand-ornament {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 14px;
-    margin-bottom: 0;
     max-height: 0;
+    margin-bottom: 0;
     opacity: 0;
     overflow: hidden;
-    transition: all .5s ease .3s;
+    transition:
+      max-height .5s ease .2s,
+      margin-bottom .5s ease .2s,
+      opacity .4s ease .3s;
   }
   .letter.expanded .letter-expand-ornament {
     max-height: 40px;
@@ -372,29 +400,16 @@
     letter-spacing: 4px;
   }
 
-  /* تكبير الخطوط لما تتوسّع */
-  .letter.expanded .letter-content h2 {
-    font-size: 3em;
-  }
-  .letter.expanded .letter-content p {
-    font-size: 1.4em;
-    line-height: 2.15;
-  }
-  .letter.expanded .letter-content .from-sign {
-    font-size: 1.9em;
-    margin-top: 12px;
-  }
-  .letter.expanded .letter-content .line-divider {
-    margin: 18px 0;
-  }
-
-  /* المحتوى الإضافي */
+  /* المحتوى الإضافي — موجود ومخفي */
   .extra-content {
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-    transition: max-height .6s ease .4s, opacity .5s ease .5s, margin .6s ease .4s;
     margin-top: 0;
+    transition:
+      max-height .6s ease .3s,
+      opacity .5s ease .4s,
+      margin-top .6s ease .3s;
   }
   .letter.expanded .extra-content {
     max-height: 200px;
@@ -438,7 +453,7 @@
   }
 
   /* ============================================
-     🌸 خلفية الموقع
+     🌸 الخلفية — موجودة من البداية
      ============================================ */
   .main-bg {
     position: fixed;
@@ -466,22 +481,22 @@
     50% { opacity: .9; transform: scale(1.08); }
   }
 
-  /* بتلات ورد */
+  /* ============================================
+     🌸 الزخارف — موجودة من البداية لكن مخفية
+     ============================================ */
   .petal {
     position: fixed;
     top: -40px;
     font-size: 18px;
-    opacity: .7;
+    opacity: 0;
     animation: fall linear infinite;
     z-index: 1060;
     pointer-events: none;
     user-select: none;
   }
   @keyframes fall {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-    10% { opacity: .8; }
-    90% { opacity: .6; }
-    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(360deg); }
   }
 
   .sparkle {
@@ -490,6 +505,7 @@
     background: var(--gold);
     border-radius: 50%;
     box-shadow: 0 0 8px 2px rgba(201,162,39,.7);
+    opacity: 0;
     animation: twinkle 2.4s ease-in-out infinite;
     z-index: 1060;
     pointer-events: none;
@@ -507,13 +523,16 @@
     .env-to { bottom: 20px; }
     .seal { width: 46px; height: 46px; font-size: 1.1em; }
 
-    .letter { width: 270px; bottom: 30px; }
-    .letter.risen { transform: translateX(-50%) translateY(-250px) scaleY(0.12); }
-    .letter.unfolded { transform: translateX(-50%) translateY(-250px) scaleY(1); }
+    .letter {
+      width: 270px;
+      margin-left: -135px;
+    }
+    .letter.risen,
+    .letter.unfolded { transform: translateY(-250px); }
 
     .letter.expanded {
       width: 94%;
-      max-width: 500px;
+      margin-left: -47%;
     }
     .letter.expanded .letter-content { padding: 30px 20px 24px; }
     .letter.expanded .letter-content h2 { font-size: 2em; }
@@ -591,6 +610,46 @@
   </div>
 
 <script>
+  /* ===== إنشاء الزخارف من البداية (وهي مخفية) ===== */
+  const petals = ['🌸', '🌷', '🤍', '✨', '🌹'];
+  const petalEls = [];
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = petals[Math.floor(Math.random() * petals.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.fontSize = (12 + Math.random() * 16) + 'px';
+    p.style.animationDuration = (9 + Math.random() * 8) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    document.body.appendChild(p);
+    petalEls.push(p);
+  }
+
+  const sparkleEls = [];
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.top = Math.random() * 100 + 'vh';
+    s.style.animationDelay = (Math.random() * 3) + 's';
+    s.style.animationDuration = (2 + Math.random() * 2) + 's';
+    document.body.appendChild(s);
+    sparkleEls.push(s);
+  }
+
+  /* ===== ظهور الزخارف (بالـ opacity بس، والحركة شغالة بالفعل) ===== */
+  function revealDecorations() {
+    petalEls.forEach(p => {
+      p.style.transition = 'opacity 1.2s ease';
+      p.style.opacity = '0.75';
+    });
+    sparkleEls.forEach(s => {
+      s.style.transition = 'opacity 1s ease';
+      s.style.opacity = '1';
+    });
+  }
+
+  /* ===== فتح الرسالة ===== */
   let opened = false;
 
   function openLetter() {
@@ -619,52 +678,24 @@
       letter.classList.add('unfolded');
     }, 550);
 
-    // 4) الظرف ينزل ويختفي + الخلفية تتغير — 1000ms
+    // 4) الظرف ينزل + الخلفية تظهر — 1000ms
     setTimeout(() => {
       env.style.transform = 'translateY(500px)';
       env.style.opacity = '0';
       mainBg.classList.add('show');
     }, 1000);
 
-    // 5) المشهد الأسود يختفي بس الرسالة تفضل — 1300ms
+    // 5) المشهد الأسود يختفي — 1250ms
     setTimeout(() => {
       intro.classList.add('hide');
       document.body.style.background = 'transparent';
-    }, 1300);
+    }, 1250);
 
-    // 6) الرسالة تتوسّع تدريجياً لحد ما تملأ الشاشة — 1500ms
+    // 6) الرسالة تتوسّع + الزخارف تظهر — 1450ms
     setTimeout(() => {
       letter.classList.add('expanded');
-      createDecorations();
-    }, 1500);
-  }
-
-  let decorationsCreated = false;
-  function createDecorations() {
-    if (decorationsCreated) return;
-    decorationsCreated = true;
-
-    const petals = ['🌸', '🌷', '🤍', '✨', '🌹'];
-    for (let i = 0; i < 14; i++) {
-      const p = document.createElement('div');
-      p.className = 'petal';
-      p.textContent = petals[Math.floor(Math.random() * petals.length)];
-      p.style.left = Math.random() * 100 + 'vw';
-      p.style.fontSize = (12 + Math.random() * 16) + 'px';
-      p.style.animationDuration = (9 + Math.random() * 8) + 's';
-      p.style.animationDelay = (Math.random() * 10) + 's';
-      document.body.appendChild(p);
-    }
-
-    for (let i = 0; i < 18; i++) {
-      const s = document.createElement('div');
-      s.className = 'sparkle';
-      s.style.left = Math.random() * 100 + 'vw';
-      s.style.top = Math.random() * 100 + 'vh';
-      s.style.animationDelay = (Math.random() * 3) + 's';
-      s.style.animationDuration = (2 + Math.random() * 2) + 's';
-      document.body.appendChild(s);
-    }
+      revealDecorations();
+    }, 1450);
   }
 </script>
 </body>
