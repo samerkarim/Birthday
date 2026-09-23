@@ -195,32 +195,18 @@
   }
 
   /* ============================================
-     📜 الرسالة — النص مضمون 100%
+     📜 الرسالة
      ============================================ */
-
-  /*
-    الفكرة:
-    - position: fixed دايماً (من البداية)
-    - في الوسط أفقياً بـ left: 50% + transform: translateX(-50%)
-    - التمركز الرأسي عن طريق top و transform
-    - كل الأبعاد بالنسبة للشاشة — مفيش أي حساب معقد
-  */
-
   .letter-wrap {
     position: fixed;
-    /* التمركز الأفقي — دايماً في النص */
     left: 50%;
-    /* التمركز الرأسي — دايماً في نص الشاشة */
     top: 50%;
-    /* العرض */
     width: 340px;
     max-width: 92vw;
-    /* التمركز عن طريق transform */
     transform: translate(-50%, -50%) translateY(180px);
     z-index: 20;
     opacity: 0;
     pointer-events: none;
-    /* الحركة */
     transition:
       transform .5s cubic-bezier(.2,.8,.2,1),
       opacity .3s ease,
@@ -229,7 +215,6 @@
     will-change: transform, width, opacity;
   }
 
-  /* داخل الظرف — في مكان الظرف */
   .letter-wrap.folded {
     opacity: 1;
     transform: translate(-50%, -50%) translateY(180px);
@@ -237,7 +222,6 @@
     z-index: 3;
   }
 
-  /* طلعت لفوق — فوق الظرف */
   .letter-wrap.risen {
     opacity: 1;
     transform: translate(-50%, -50%) translateY(-120px);
@@ -245,7 +229,6 @@
     z-index: 20;
   }
 
-  /* اتوسّعت — في نص الشاشة بالظبط */
   .letter-wrap.expanded {
     width: 720px;
     max-width: 92vw;
@@ -254,7 +237,6 @@
     pointer-events: auto;
   }
 
-  /* الجسم الداخلي — الطي والفرد */
   .letter-inner {
     background: #fffdf7;
     border-radius: 8px;
@@ -299,7 +281,6 @@
     position: relative;
   }
 
-  /* الإطار الذهبي الداخلي */
   .letter-wrap.expanded .letter-inner::before {
     content: '';
     position: absolute;
@@ -367,7 +348,6 @@
   .fold-line.one { top: 33.33%; }
   .fold-line.two { top: 66.66%; }
 
-  /* تكبير لما تتوسّع */
   .letter-wrap.expanded .letter-content h2 { font-size: 2.6em; }
   .letter-wrap.expanded .letter-content p { font-size: 1.25em; line-height: 2.1; }
   .letter-wrap.expanded .letter-content .from-sign { font-size: 1.7em; margin-top: 12px; }
@@ -535,7 +515,7 @@
 <body>
 
   <div class="intro" id="intro">
-    <div class="envelope-scene" id="envelopeScene">
+    <div class="envelope-scene">
 
       <!-- الرسالة -->
       <div class="letter-wrap" id="letter">
@@ -552,8 +532,10 @@
             <div class="line-divider"></div>
             <p>
               كل سنة وانتي طيبة يا <span class="name-to">بطوطة</span> 🌸<br>
+              يا أحلى أخت وسند،<br>
               ربنا يديكي الصحة والعافية وطول العمر،<br>
-              ويسعدك ويحققلك كل أمنياتك يارب 🤍
+              ويسعدك ويحققلك كل أمنياتك يارب،<br>
+              وانتي دايماً منورة حياتنا 🤍
             </p>
             <div class="line-divider"></div>
             <p class="from-sign">with love, Samer</p>
@@ -650,7 +632,7 @@
     // 1) الظرف يفتح
     env.classList.add('open');
 
-    // 2) الرسالة تطلع لفوق (لسه جوه intro)
+    // 2) الرسالة تطلع لفوق
     setTimeout(() => {
       letter.classList.remove('folded');
       letter.classList.add('risen');
@@ -661,31 +643,23 @@
       letter.classList.add('unfolded');
     }, 600);
 
-    // 4) ننقل الرسالة للـ body مباشرة عشان متتأثرش بـ intro
+    // 4) ننقل الرسالة للـ body عشان متتأثرش بـ intro.hide
     setTimeout(() => {
-      // نحفظ مكانها البصري الحالي
       const rect = letter.getBoundingClientRect();
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
 
-      // ننقلها للـ body
       document.body.appendChild(letter);
 
-      // نظبط المكان يدوياً عشان متقفزش
-      // (position: fixed + transform: translate(-50%, -50%))
-      // لكن في اللحظة دي عايزينها تفضل في نفس المكان البصري
       const offsetX = rect.left + rect.width / 2 - centerX;
       const offsetY = rect.top + rect.height / 2 - centerY;
 
       letter.style.transition = 'none';
       letter.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)`;
 
-      // بعد frame، نفعّل الـ transition ونرجعها لمكانها الصح
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           letter.style.transition = '';
-          letter.classList.add('detached-fixed');
-          // نرجعها لـ risen في النص
           letter.style.transform = '';
         });
       });
